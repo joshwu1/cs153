@@ -101,3 +101,23 @@ sys_exitFunc(void)
   }
   return exitFunc(exitStatus);
 }
+
+int
+sys_waitpid(void)
+{
+  int pid = 0;
+  int op = 0;
+  int* status;
+  if(argint(0, &pid) < 0){
+    return -1;
+  }
+  if(argptr(1, (void*)&status, sizeof(status)) < 0){
+    return -1;
+  }
+  if(argint(2, &op) < 0){
+    return -1;
+  }
+  return waitpid(pid, status, op);
+}
+  
+  
