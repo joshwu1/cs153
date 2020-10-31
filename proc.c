@@ -577,3 +577,48 @@ exitFunc(int status)
     sched();
     panic("zombie exiting");
 }
+
+int
+waitpid(int pid, int* status, int op)
+{
+  struct proc *p, *curproc = myproc();
+  int pexist; 
+  acquire(&ptable.lock);
+  
+  for(;;) {
+    pexist = 0;    
+    
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+      if(p->pid != pid) {
+        continue;
+      }
+      pexist = 1;
+      if(p->state == ZOMBIE) {
+	      kfree(p->kstack);
+      	p->kstack = 0;
+	      freevm(p->pgdir);
+	      p->pid = 0;
+      	p->parent = 0;
+      	p->name[0] = 0;
+      	p->killed = 0;
+        p->state = UNUSED;
+      	if(status) *status = p->exitStatus;
+      	p->exitStatus = 0;
+	      release(&ptable.lock);
+        return pid;
+      } 
+      else if(op == 1) { 
+	      release(&ptable.lock);
+       	return 0;
+      } 
+    }
+
+    
+    if(!pexist || curproc->killed) {
+      release(&ptable.lock);
+      return -1;
+    }
+    
+    sleep(curproc, &ptable.lock);
+  }
+}
