@@ -549,7 +549,7 @@ exitFunc(int status)
     
     for(y = 0; y < NOFILE; y++){
       if(curproc->ofile[y]){
-        fileclose(curproc->ofile[u]);
+        fileclose(curproc->ofile[y]);
         curproc->ofile[y] = 0;
       }
     }
@@ -562,10 +562,10 @@ exitFunc(int status)
     acquire(&ptable.lock);
     wakeup1(curproc->parent); //parent may be sleep in wait()
     
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->parent == curproc){
-        p->parent = initproc;
-        if(p->state == ZOMBIE){
+    for(x = ptable.proc; x < &ptable.proc[NPROC]; x++){
+      if(x->parent == curproc){
+        x->parent = initproc;
+        if(x->state == ZOMBIE){
           wakeup1(initproc);
         }
       }
