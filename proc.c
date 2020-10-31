@@ -546,6 +546,7 @@ exitFunc(int status)
   
   if(curproc == initproc){
     panic("Init exiting");
+  }
     
     for(y = 0; y < NOFILE; y++){
       if(curproc->ofile[y]){
